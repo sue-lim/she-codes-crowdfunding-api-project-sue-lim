@@ -13,7 +13,10 @@ from .permissions import IsOwnerOrReadOnly
 
 class ProjectList(APIView):
     # permission class to the project list so only logged in users can create new projects
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
     def post(self, request):
+
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
