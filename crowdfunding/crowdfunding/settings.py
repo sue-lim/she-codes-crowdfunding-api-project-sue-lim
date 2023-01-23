@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
+
 ]
 
 AUTH_USER_MODEL = 'users.CustomUser'
@@ -130,11 +131,13 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
+    'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        # when the browser creates a session and is that user so it remembers that information.
-        # tells the API to do this
-
-    ]
+        'rest_framework.authentication.SessionAuthentication'),
+    'DEFAULT_PERMISSIONS_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
 }
+
+# rest_framework.authentication.SessionAuthentication - when the browser creates a session and is that user so it remembers that information. Tells the API to do this.
+# rest_framework.permissions.IsAuthenticated - code defines the default authentication class to be Token Authentication and the Default permission class to be IsAuthenticated meaning no API can be accessed by an unauthenticated user unless either he has a token or the permission class for that API has been defined to be AllowAny.

@@ -21,6 +21,7 @@ class ProjectSerializer(serializers.Serializer):
     # '%a, %d %b %Y %H:%M %p %Z' -> "Fri, 20 Mar 2020 14:28 PM UTC"
     owner = serializers.ReadOnlyField(source='owner.id')
     # pledges = PledgeSerializer(many=True, read_only=True)
+    total = serializers.ReadOnlyField()
 
     def create(self, validated_data):
         return Project.objects.create(**validated_data)

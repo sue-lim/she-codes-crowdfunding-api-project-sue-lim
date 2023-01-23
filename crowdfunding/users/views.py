@@ -1,9 +1,12 @@
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, generics
 from .models import CustomUser
 from .serializers import CustomUserSerializer
+from rest_framework.permissions import AllowAny
+from .serializers import CustomUserSerializer, CustomUserRegisterSerializer
+from rest_framework.authentication import TokenAuthentication
 
 
 class CustomUserList(APIView):
@@ -33,3 +36,22 @@ class CustomUserDetail(APIView):
         user = self.get_object(pk)
         serializer = CustomUserSerializer(user)
         return Response(serializer.data)
+
+
+# Class based view to Get User Details using Token Authentication
+class CustomUserDetailAPI(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (AllowAny,)
+
+    def get(self, request, *args, **kwargs):
+        user = CustomUser.objects.get(id=request.user.id)
+        serializer = CustomUserSerializer(user)
+        return Response(serializer.data)
+
+
+# Class based view to register user
+
+
+class CustomUserRegisterAPIView(generics.CreateAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = CustomUserRegisterSerializer

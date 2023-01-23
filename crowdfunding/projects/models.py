@@ -20,8 +20,17 @@ class Project(models.Model):
         related_name='owner_projects'
     )
 
+    # liked_by = models.ManyToManyField(
+    #     User,
+    #     related_name=
+    # )
+    # @property & annotations
+    # insert this to count the sum the amount of pledges to calculate
+    @property
+    def total(self):
+        return self.pledges.aggregate(sum=models.Sum('amount'))['sum']
 
-# more class stuff to insert
+
 class Pledge(models.Model):
     amount = models.IntegerField()
     comment = models.CharField(max_length=200)
