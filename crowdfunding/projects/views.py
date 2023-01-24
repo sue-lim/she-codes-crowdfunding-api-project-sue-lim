@@ -80,6 +80,44 @@ class ProjectList(APIView):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+# class ProjectList(APIView):
+#     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+#     def get(self, request):
+#         projects = Project.objects.all()
+
+#         #filter for open projects only
+#         is_open = request.query_params.get('is_open', None)
+#         if is_open:
+#             projects = projects.filter(is_open=is_open)
+
+#         #order by date created
+#         order_by = request.query_params.get('order_by', None)
+#         if order_by == 'date_created':
+#             projects = projects.order_by(order_by)
+
+#         #order by the most recent pledges
+#         if order_by == 'recent_pledges':
+#             projects = Project.objects.annotate(
+#                 pledge_date=Max('pledges_date_created')
+#             ).order_by(
+#                 '-pledge_date'
+#             )
+
+#         #order by the number of pledges
+#         if order_by == 'num_pledges':
+#             projects = Project.objects.annotate(
+#                 pledge_count=Count('pledges')
+#             ).order_by(
+#                 '-pledge_count'
+#             )
+
+#         paginator = LimitOffsetPagination()
+#         result_page = paginator.paginate_queryset(projects, request)
+
+#         serializer = ProjectSerializer(result_page, many=True)
+#         return Response(serializer.data)
+
 
 class PledgeList(generics.ListCreateAPIView):
     queryset = Pledge.objects.all()

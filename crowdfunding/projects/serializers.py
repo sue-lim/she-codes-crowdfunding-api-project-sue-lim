@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Project, Pledge
+from users.serializers import CustomUserSerializer
 
 
 class PledgeSerializer(serializers.ModelSerializer):
@@ -20,7 +21,6 @@ class ProjectSerializer(serializers.Serializer):
     date_created = serializers.DateTimeField('%a, %d %b %Y %H:%M %Z')
     # '%a, %d %b %Y %H:%M %p %Z' -> "Fri, 20 Mar 2020 14:28 PM UTC"
     owner = serializers.ReadOnlyField(source='owner.id')
-    # pledges = PledgeSerializer(many=True, read_only=True)
     total = serializers.ReadOnlyField()
 
     def create(self, validated_data):
@@ -42,16 +42,17 @@ class ProjectSerializer(serializers.Serializer):
 
 class ProjectDetailSerializer(ProjectSerializer):
     pledges = PledgeSerializer(many=True, read_only=True)
+    liked_by = CustomUserSerializer(many=True, read_only=True)
 
-    def update(self, instance, validated_data):
-        instance.title = validated_data.get('title', instance.title)
-        instance.description = validated_data.get(
-            'description', instance.description)
-        instance.goal = validated_data.get('goal', instance.goal)
-        instance.image = validated_data.get('image', instance.image)
-        instance.is_open = validated_data.get('is_open', instance.is_open)
-        instance.date_created = validated_data.get(
-            'date_created', instance.date_created)
-        instance.owner = validated_data.get('owner', instance.owner)
-        instance.save()
-        return instance
+    # def update(self, instance, validated_data):
+    #     instance.title = validated_data.get('title', instance.title)
+    #     instance.description = validated_data.get(
+    #         'description', instance.description)
+    #     instance.goal = validated_data.get('goal', instance.goal)
+    #     instance.image = validated_data.get('image', instance.image)
+    #     instance.is_open = validated_data.get('is_open', instance.is_open)
+    #     instance.date_created = validated_data.get(
+    #         'date_created', instance.date_created)
+    #     instance.owner = validated_data.get('owner', instance.owner)
+    #     instance.save()
+    # return instance
