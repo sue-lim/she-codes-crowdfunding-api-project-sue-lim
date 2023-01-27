@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils import timezone
 
 
 User = get_user_model()
@@ -19,7 +20,6 @@ class Project(models.Model):
         on_delete=models.CASCADE,
         related_name='owner_projects'
     )
-
     liked_by = models.ManyToManyField(
         User,
         related_name='liked_projects'
@@ -32,9 +32,24 @@ class Project(models.Model):
         return self.pledges.aggregate(sum=models.Sum('amount'))['sum']
 
 
+class Comment(models.Model):
+    title = models.CharField(max_length=100, null=True, blank=True)
+    content = models.TextField(blank=True, null=True)
+    project = models.ForeignKey(
+        'Project',
+        related_name='comments',
+        on_delete=models.CASCADE
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comment_author_projects'
+    )
+
+
 class Pledge(models.Model):
     amount = models.IntegerField()
-    comment = models.CharField(max_length=200)
+    comment = models.TextField()
     anonymous = models.BooleanField()
     project = models.ForeignKey(
         'Project',

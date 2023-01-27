@@ -7,6 +7,7 @@ from .serializers import CustomUserSerializer
 from rest_framework.permissions import AllowAny
 from .serializers import CustomUserSerializer, CustomUserRegisterSerializer
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 
 class CustomUserList(APIView):
@@ -53,5 +54,6 @@ class CustomUserDetailAPI(APIView):
 
 
 class CustomUserRegisterAPIView(generics.CreateAPIView):
+    queryset = CustomUser.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = CustomUserRegisterSerializer

@@ -33,7 +33,7 @@ DEBUG = os.environ.get(
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-ALLOWED_HOSTS = ['spring-glade-2620.fly.dev']
+ALLOWED_HOSTS = ['spring-glade-2620.fly.dev', '127.0.0.1', 'localhost']
 CORS_ALLOW_ALL_ORIGINS = True
 CSRF_TRUSTED_ORIGINS = ['https://*.fly.dev']
 

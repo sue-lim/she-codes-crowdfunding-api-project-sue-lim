@@ -1,14 +1,15 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Project
+from .models import Project, Pledge, Comment
 from .serializers import ProjectSerializer
 from django.http import Http404
 from rest_framework import status, permissions
 from rest_framework import generics
-from .models import Project, Pledge
-from .serializers import ProjectSerializer, PledgeSerializer, ProjectDetailSerializer
+from .serializers import ProjectSerializer, PledgeSerializer, ProjectDetailSerializer, CommentSerializer
 from .permissions import IsOwnerOrReadOnly
+from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.models import User
 
 
 class ProjectList(APIView):
@@ -16,7 +17,6 @@ class ProjectList(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def post(self, request):
-
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -31,9 +31,7 @@ class ProjectList(APIView):
 
 
 class ProjectDetail(APIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
-                          IsOwnerOrReadOnly
-                          ]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_object(self, pk):
         try:
@@ -80,6 +78,73 @@ class ProjectList(APIView):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+
+class PledgeList(generics.ListCreateAPIView):
+    queryset = Pledge.objects.all()
+    serializer_class = PledgeSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(supporter=self.request.user)
+
+
+class PledgeDetail(generics.RetrieveAPIView):
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = Pledge.objects.all()
+    serializer_class = PledgeSerializer
+
+
+class CommentList(generics.ListAPIView):
+    # permission class to the so only logged in users can create new projects
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    def post(self, request):
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class CommentDetail(generics.RetrieveAPIView):
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    # def get_object(self, pk):
+    #     try:
+    #         comment = Comment.objects.get(pk=pk)
+    #         self.check_object_permissions(self.request, comment)
+    #         return comment
+    #     except Comment.DoesNotExist:
+    #         raise Http404
+
+    # def get(self, request, pk):
+    #     comment = self.get_object(pk)
+    #     serializer = CommentSerializer(comment)
+    #     return Response(serializer.data)
+
+    # def put(self, request, pk):
+    #     comment = self.get_object(pk)
+    #     data = request.data
+    #     serializer = ProjectSerializer(
+    #         instance=comment,
+    #         data=data,
+    #         partial=True
+    #     )
+    #     if serializer.is_valid():
+    #         serializer.save()
+
+
+####################################################################################
+# PAGEINATOR TO BE IMPLEMENTED
 # class ProjectList(APIView):
 #     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
@@ -117,11 +182,3 @@ class ProjectList(APIView):
 
 #         serializer = ProjectSerializer(result_page, many=True)
 #         return Response(serializer.data)
-
-
-class PledgeList(generics.ListCreateAPIView):
-    queryset = Pledge.objects.all()
-    serializer_class = PledgeSerializer
-
-    def perform_create(self, serializer):
-        serializer.save(supporter=self.request.user)
