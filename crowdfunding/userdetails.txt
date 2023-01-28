@@ -1,0 +1,23 @@
+		"username": "samsam1",
+		"email": "samsam1@samsam1.com",
+		"password": "samsam123",
+		"password2": "samsam123",
+		"first_name": "Sam", 
+		"last_name": "Sam"
+
+
+		"username": "Jondoe1",
+		"email": "jondoe1@jondoe1.com",
+		"password": "jondoe123",
+		"password2": "jondoe123",
+		"first_name": "Jon", 
+		"last_name": "Doe"
+
+
+		"username": "SamSmtih",
+		"email": "samsmith@samsmith.com",
+		"password": "samsmith123",
+		"password2": "samsmith123",
+		"first_name": "Sam", 
+		"last_name": "Smith"
+

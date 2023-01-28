@@ -24,11 +24,13 @@ SECRET_KEY = os.environ.get(
     'DJANGO_SECRET_KEY', 'django-insecure-6f5fiv53l$d=%d_0_8&znvd!6&d3rfy-qowzswx^u)i-p_dsm6')
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = os.environ.get(
-    'DJANGO_DEBUG',
-    'False'
-    != 'False'
-)
+# DEBUG = os.environ.get(
+#     'DJANGO_DEBUG',
+#     'False'
+#     != 'False'
+# )
+
+DEBUG = False
 
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -51,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_filters',
     'users.apps.UsersConfig',
 
 ]
@@ -149,7 +152,10 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication'),
     'DEFAULT_PERMISSIONS_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-    )
+    ),
+    'DEFAULT_FILTER_BACKENDS' : (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
 }
 
 # rest_framework.authentication.SessionAuthentication - when the browser creates a session and is that user so it remembers that information. Tells the API to do this.

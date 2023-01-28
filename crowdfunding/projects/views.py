@@ -1,21 +1,24 @@
 from django.shortcuts import render
+from django.http import Http404
+from django.contrib.auth.decorators import login_required
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import DynamicSearchFilter
+from .models import Project, Pledge, Comment, Category
+from .permissions import IsOwnerOrReadOnly
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Project, Pledge, Comment
+from rest_framework import status, permissions, generics
+from rest_framework.filters import OrderingFilter, SearchFilter
 from .serializers import ProjectSerializer
-from django.http import Http404
-from rest_framework import status, permissions
-from rest_framework import generics
-from .serializers import ProjectSerializer, PledgeSerializer, ProjectDetailSerializer, CommentSerializer
-from .permissions import IsOwnerOrReadOnly
-from django.contrib.auth.password_validation import validate_password
-from django.contrib.auth.models import User
+from .serializers import ProjectSerializer, PledgeSerializer, ProjectDetailSerializer, CommentSerializer, CategorySerializer, CategoryDetailSerializer
+import django_filters.rest_framework
+
 
 
 class ProjectList(APIView):
     # permission class to the project list so only logged in users can create new projects
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
+    
     def post(self, request):
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
@@ -29,9 +32,8 @@ class ProjectList(APIView):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-
 class ProjectDetail(APIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def get_object(self, pk):
         try:
@@ -49,16 +51,21 @@ class ProjectDetail(APIView):
     def put(self, request, pk):
         project = self.get_object(pk)
         data = request.data
-        serializer = ProjectDetailSerializer(
-            instance=project,
-            data=data,
-            partial=True
-        )
+        serializer = ProjectDetailSerializer(instance=project,data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
+        
+    def delete(self, request, id=None):
+        project = self.get_object(id=id)
+        # serializer = ProjectDetailSerializer(project)
+        project.delete()
+        return Response(ProjectDetailSerializer.data, status=status.HTTP_204_NO_CONTENT)
+    
+    
 
-
+'''PROJECT LIST VIEW FOR PROJECTS & IF LOGGED IN YOU CAN DELETE PROJECTS'''
 class ProjectList(APIView):
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def get(self, request):
         projects = Project.objects.all()
@@ -77,6 +84,11 @@ class ProjectList(APIView):
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+    def delete(self, request, id=None):
+        project = self.get_object(id=id)
+        # serializer = ProjectDetailSerializer(project)
+        project.delete()
+        return Response(ProjectDetailSerializer.data, status=status.HTTP_204_NO_CONTENT)
 
 
 class PledgeList(generics.ListCreateAPIView):
@@ -85,6 +97,12 @@ class PledgeList(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(supporter=self.request.user)
+        
+    def delete(self, request, id=None):
+        pledge = self.get_object(id=id)
+        # serializer = ProjectDetailSerializer(project)
+        pledge.delete()
+        return Response(PledgeSerializer.data, status=status.HTTP_204_NO_CONTENT)
 
 
 class PledgeDetail(generics.RetrieveAPIView):
@@ -94,10 +112,11 @@ class PledgeDetail(generics.RetrieveAPIView):
 
 
 class CommentList(generics.ListAPIView):
-    # permission class to the so only logged in users can create new projects
+    # permission class to the so only logged in users can create comments associated to a project
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
 
     def post(self, request):
         serializer = CommentSerializer(data=request.data)
@@ -111,12 +130,29 @@ class CommentList(generics.ListAPIView):
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+        
+    def delete(self, request, id=None):
+        comment = self.get_object(id=id)
+        comment.delete()
+        return Response(CommentSerializer.data, status=status.HTTP_204_NO_CONTENT)
+
+class CategoryList(generics.ListAPIView):
+    """ url: categories/ """
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
 
+class CategoryDetail(generics.RetrieveAPIView):
+    """ url: categories/<str:name>/"""
+    queryset = Category.objects.all()
+    serializer_class = CategoryDetailSerializer
+    lookup_field = 'name'
+    
 class CommentDetail(generics.RetrieveAPIView):
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+
 
     # def get_object(self, pk):
     #     try:
@@ -143,6 +179,8 @@ class CommentDetail(generics.RetrieveAPIView):
     #         serializer.save()
 
 
+
+    
 ####################################################################################
 # PAGEINATOR TO BE IMPLEMENTED
 # class ProjectList(APIView):
@@ -182,3 +220,4 @@ class CommentDetail(generics.RetrieveAPIView):
 
 #         serializer = ProjectSerializer(result_page, many=True)
 #         return Response(serializer.data)
+
