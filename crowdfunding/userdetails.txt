@@ -21,3 +21,11 @@
 		"first_name": "Sam", 
 		"last_name": "Smith"
 
+		"username": "BenBrown",
+		"email": "BenBrow1@BenBrown1.com",
+		"password": "BenBrown1",
+		"password2": "BenBrown1",
+		"first_name": "Ben", 
+		"last_name": "Brown"
+	
+
