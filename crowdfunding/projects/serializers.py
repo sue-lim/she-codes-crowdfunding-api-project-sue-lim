@@ -17,7 +17,7 @@ class CommentSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
     title = serializers.CharField(max_length=200)
     content = serializers.CharField
-    # author = serializers.ReadOnlyField(source='owner.id')
+    author = serializers.ReadOnlyField(source='owner.id')
 
     def create(self, validated_data):
         return Comment.objects.create(**validated_data)
@@ -50,9 +50,9 @@ class ProjectSerializer(serializers.Serializer):
     goal = serializers.IntegerField()
     image = serializers.URLField()
     is_open = serializers.BooleanField()
-    date_created = serializers.DateTimeField('%a, %d %b %Y %H:%M %Z')
+    date_created = serializers.DateTimeField()
 
-    comments = CommentSerializer(many=True)
+    # comments = CommentSerializer(many=True)
     owner_id = serializers.ReadOnlyField(source='owner.id')
     owner_username = serializers.ReadOnlyField(source='owner.username')
     total = serializers.ReadOnlyField()

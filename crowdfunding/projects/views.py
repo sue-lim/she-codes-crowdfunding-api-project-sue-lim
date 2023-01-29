@@ -16,7 +16,8 @@ from rest_framework.settings import api_settings
 
 class ProjectList(APIView):
     # permission class to the project list so only logged in users can create new projects
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAdminUser]
     
     def post(self, request):
         serializer = ProjectSerializer(data=request.data)
@@ -33,6 +34,8 @@ class ProjectList(APIView):
 
 class ProjectDetail(APIView):
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAdminUser]
+    
     def get_object(self, pk):
         try:
             project = Project.objects.get(pk=pk)
@@ -55,7 +58,7 @@ class ProjectDetail(APIView):
         
     def delete(self, request, id=None):
         project = self.get_object(id=id)
-        # serializer = ProjectDetailSerializer(project)
+        serializer = ProjectDetailSerializer(project)
         project.delete()
         return Response(ProjectDetailSerializer.data, status=status.HTTP_204_NO_CONTENT)
     
@@ -64,6 +67,7 @@ class ProjectDetail(APIView):
 '''PROJECT LIST VIEW FOR PROJECTS & IF LOGGED IN YOU CAN DELETE PROJECTS'''
 class ProjectList(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    
     def get(self, request):
         projects = Project.objects.all()
         serializer = ProjectSerializer(projects, many=True)
@@ -146,9 +150,7 @@ class CategoryDetail(generics.RetrieveAPIView):
     queryset = Category.objects.all()
     serializer_class = CategoryDetailSerializer
     lookup_field = 'name'
-    
-    
-    
+        
     
 '''BELOW TO CULL AS THEY DO NOT SEEM TO SERVE A PURPOSE'''
 # class CommentDetail(generics.RetrieveAPIView):
