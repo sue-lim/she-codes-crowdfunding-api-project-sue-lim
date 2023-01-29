@@ -111,12 +111,9 @@ class PledgeList(generics.ListCreateAPIView):
 
 class CommentList(generics.ListAPIView):
     # permission class to the so only logged in users can create comments associated to a project
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
     # filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
+    queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['project', 'author']
