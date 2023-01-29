@@ -22,6 +22,7 @@ class CustomUserList(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CustomUserDetail(APIView):
+    
     def get_object(self, pk):
         try:
             return CustomUser.objects.get(pk=pk)
@@ -34,7 +35,7 @@ class CustomUserDetail(APIView):
         return Response(serializer.data)
 
     def put(self, request, pk):
-        user = self.getobject(pk)
+        user = self.get_object(pk)
         data = request.data
         serializer = CustomUserSerializer(
             instance=user,

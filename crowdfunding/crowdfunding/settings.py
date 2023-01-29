@@ -147,15 +147,15 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication'),
-    'DEFAULT_PERMISSIONS_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication'],
+    'DEFAULT_PERMISSIONS_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-    ),
-    'DEFAULT_FILTER_BACKENDS' : (
+    ],
+    'DEFAULT_FILTER_BACKENDS' : [
         'django_filters.rest_framework.DjangoFilterBackend',
-    ),
+    ],
 }
 
 # rest_framework.authentication.SessionAuthentication - when the browser creates a session and is that user so it remembers that information. Tells the API to do this.

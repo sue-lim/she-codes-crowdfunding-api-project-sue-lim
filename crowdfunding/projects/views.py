@@ -1,7 +1,7 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import render
 from django.http import Http404
 from django.contrib.auth.decorators import login_required
-from django_filters.rest_framework import DjangoFilterBackend
 from .filters import DynamicSearchFilter
 from .models import Project, Pledge, Comment, Category
 from .permissions import IsOwnerOrReadOnly
@@ -11,8 +11,7 @@ from rest_framework import status, permissions, generics
 from rest_framework.filters import OrderingFilter, SearchFilter
 from .serializers import ProjectSerializer
 from .serializers import ProjectSerializer, PledgeSerializer, ProjectDetailSerializer, CommentSerializer, CategorySerializer, CategoryDetailSerializer
-import django_filters.rest_framework
-
+from rest_framework.settings import api_settings
 
 
 class ProjectList(APIView):
@@ -34,7 +33,6 @@ class ProjectList(APIView):
 
 class ProjectDetail(APIView):
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-
     def get_object(self, pk):
         try:
             project = Project.objects.get(pk=pk)
@@ -65,8 +63,7 @@ class ProjectDetail(APIView):
 
 '''PROJECT LIST VIEW FOR PROJECTS & IF LOGGED IN YOU CAN DELETE PROJECTS'''
 class ProjectList(APIView):
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     def get(self, request):
         projects = Project.objects.all()
         serializer = ProjectSerializer(projects, many=True)
@@ -89,12 +86,15 @@ class ProjectList(APIView):
         # serializer = ProjectDetailSerializer(project)
         project.delete()
         return Response(ProjectDetailSerializer.data, status=status.HTTP_204_NO_CONTENT)
-
+    
 
 class PledgeList(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Pledge.objects.all()
     serializer_class = PledgeSerializer
-
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['supporter', 'project', 'anonymous']
+        
     def perform_create(self, serializer):
         serializer.save(supporter=self.request.user)
         
@@ -105,18 +105,17 @@ class PledgeList(generics.ListCreateAPIView):
         return Response(PledgeSerializer.data, status=status.HTTP_204_NO_CONTENT)
 
 
-class PledgeDetail(generics.RetrieveAPIView):
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    queryset = Pledge.objects.all()
-    serializer_class = PledgeSerializer
-
-
 class CommentList(generics.ListAPIView):
     # permission class to the so only logged in users can create comments associated to a project
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    # filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    serializer_class = CommentSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['project', 'author']
 
     def post(self, request):
         serializer = CommentSerializer(data=request.data)
@@ -148,10 +147,14 @@ class CategoryDetail(generics.RetrieveAPIView):
     serializer_class = CategoryDetailSerializer
     lookup_field = 'name'
     
-class CommentDetail(generics.RetrieveAPIView):
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
+    
+    
+    
+'''BELOW TO CULL AS THEY DO NOT SEEM TO SERVE A PURPOSE'''
+# class CommentDetail(generics.RetrieveAPIView):
+#     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+#     queryset = Comment.objects.all()
+#     serializer_class = CommentSerializer
 
 
     # def get_object(self, pk):
@@ -178,6 +181,10 @@ class CommentDetail(generics.RetrieveAPIView):
     #     if serializer.is_valid():
     #         serializer.save()
 
+# class PledgeDetail(generics.RetrieveAPIView):
+#     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+#     queryset = Pledge.objects.all()
+#     serializer_class = PledgeSerializer
 
 
     
