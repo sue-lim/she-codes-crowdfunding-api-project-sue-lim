@@ -131,7 +131,7 @@ USERS CAN CREATE ACCOUNTS TO PLEDGE, ADD COMMENTS.
 
 ```shell
 curl --request POST \
-  --url http://127.0.0.1:8000/users/ \
+  --url https://spring-glade-2620.fly.dev/users/ \
   --header 'Content-Type: application/json' \
   --data '{
 	"username": "testuser",
@@ -156,7 +156,7 @@ curl --request POST \
 
 ```shell
 curl --request POST \
-  --url http://127.0.0.1:8000/projects/ \
+  --url https://spring-glade-2620.fly.dev/projects/ \
   --header 'Authorization: Token 5b8c82ec35c8e8cb1fac24f8eb6d480a367f322a' \
   --header 'Content-Type: application/json' \
   --data '{
