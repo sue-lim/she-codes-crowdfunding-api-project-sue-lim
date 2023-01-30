@@ -1,28 +1,37 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from django.http import Http404
 from .models import CustomUser
+from rest_framework.generics import GenericAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics
 from rest_framework.permissions import AllowAny
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import status, permissions, generics
 from .serializers import CustomUserSerializer
 
-class CustomUserList(APIView):
+'''VIEW ALL USERS & CREATE USER'''
+class CustomUserList(generics.ListCreateAPIView):
+    permission_classes = (AllowAny,)
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['username','first_name','last_name']
+    
     def get(self, request):
         users = CustomUser.objects.all()
         serializer = CustomUserSerializer(users, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
-        serializer = CustomUserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class CustomUserDetail(APIView):
+    def perform_create(self, serializer):
+        serializer.save(supporter=self.request.user)
     
+
+'''VIEW USER & UPDATE DETAILS | RetrieveUpdateAPIView for single instances '''
+class CustomUserDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = CustomUserSerializer
     def get_object(self, pk):
         try:
             return CustomUser.objects.get(pk=pk)
@@ -46,20 +55,16 @@ class CustomUserDetail(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-
-# Class based view to Get User Details using Token Authentication
-# class CustomUserDetailAPI(APIView):
-#     authentication_classes = (TokenAuthentication,)
-#     permission_classes = (AllowAny,)
-
-#     def get(self, request, *args, **kwargs):
-#         user = CustomUser.objects.get(id=request.user.id)
-#         serializer = CustomUserSerializer(user)
-#         return Response(serializer.data)
+    
+'''ADD DEF DELETE FUNCTION'''
 
 
-# Class based view to register user
-# class CustomUserRegisterAPIView(generics.CreateAPIView):
-#     queryset = CustomUser.objects.all()
-#     permission_classes = (AllowAny,)
-#     serializer_class = CustomUserRegisterSerializer
+'''Class based view to Get User Details using Token Authentication'''
+class CustomUserDetailAPI(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (AllowAny,)
+
+    def get(self, request, *args, **kwargs):
+        user = CustomUser.objects.get(id=request.user.id)
+        serializer = CustomUserSerializer(user)
+        return Response(serializer.data)

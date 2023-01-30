@@ -19,8 +19,10 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 '''CUSTOM 404 MESSAGE FROM VIEWS'''
 from .views import custom404
+# custom500
 
 handler404 = custom404
+# handler500 = custom500
 
 urlpatterns = [
     path('admin/', admin.site.urls),

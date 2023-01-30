@@ -6,40 +6,37 @@ from users.serializers import CustomUserSerializer
 
 '''Comments Serializer / Form'''
 class CommentSerializer(serializers.ModelSerializer):
+    commentor = serializers.ReadOnlyField(source='commentor.username')
     class Meta:
         model = Comment
-        fields = ['id', 'project', 'title', 'content', 'author']
-        read_only_fields = ['id']
-
+        fields = '__all__'
+        # fields = ['id', 'project', 'title', 'content', 'author']
+        # read_only_fields = ['id']
+        
     def create(self, validated_data):
         return Comment.objects.create(**validated_data)
-
-    id = serializers.ReadOnlyField()
-    title = serializers.CharField(max_length=200)
-    content = serializers.CharField
-    author = serializers.ReadOnlyField(source='owner.id')
-
-    def create(self, validated_data):
-        return Comment.objects.create(**validated_data)
-
+    
     def update(self, instance, validated_data):
-        instance.title = validated_data.get('title', instance.title)
-        instance.content = validated_data.get('content', instance.content)
-        instance.author = validated_data.get('author', instance.author)
         instance.save()
         return instance
-    
+
 
 '''Pledge Serializer / Form'''
 class PledgeSerializer(serializers.ModelSerializer):
     supporter = serializers.ReadOnlyField(source='supporter.username')
-    date_sent = serializers.ReadOnlyField()
     class Meta:
         model = Pledge
         # fields = ['id', 'amount', 'comment','anonymous', 'project', 'supporter']
         # read_only_fields = ['id', 'supporter']
         fields = '__all__' 
         '''THIS LINE __all__ replaces the needs in the model.serializer to dd the fields seperately'''
+
+    def create(self, validated_data):
+        return Pledge.objects.create(**validated_data)
+    
+    def update(self, instance, validated_data):
+        instance.save()
+        return instance
         
 
 '''Project Serializer / Form'''

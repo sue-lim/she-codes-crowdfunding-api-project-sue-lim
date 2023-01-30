@@ -3,9 +3,7 @@ from django.db import models
 from django.utils import timezone
 from django.conf import settings
 
-
 User = get_user_model()
-
 
 '''Projects Model'''
 class Project(models.Model):
@@ -36,14 +34,8 @@ class Project(models.Model):
 class Comment(models.Model):
     title = models.CharField(max_length=100, null=True, blank=True)
     content = models.TextField(blank=True, null=True)
-    project = models.ForeignKey(
-        'Project', related_name='comments', on_delete=models.CASCADE
-    )
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='comment_author_projects'
-    )
+    project = models.ForeignKey('Project',  on_delete=models.CASCADE, related_name='comments')
+    commentor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='commentor_comment')
 
 '''Pledge Model'''
 class Pledge(models.Model):

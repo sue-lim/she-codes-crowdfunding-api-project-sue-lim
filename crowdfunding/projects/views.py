@@ -9,16 +9,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions, generics
 from rest_framework.filters import OrderingFilter, SearchFilter
-from .serializers import ProjectSerializer
 from .serializers import ProjectSerializer, PledgeSerializer, ProjectDetailSerializer, CommentSerializer, CategorySerializer, CategoryDetailSerializer
 from rest_framework.settings import api_settings
 
 
 class ProjectList(APIView):
-    # permission class to the project list so only logged in users can create new projects
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-    permission_classes = [permissions.IsAdminUser]
-    
+    permission_classes = [permissions.IsAuthenticated]
     def post(self, request):
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
@@ -34,7 +31,7 @@ class ProjectList(APIView):
 
 class ProjectDetail(APIView):
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated]
     
     def get_object(self, pk):
         try:
@@ -101,36 +98,47 @@ class PledgeList(generics.ListCreateAPIView):
         
     def perform_create(self, serializer):
         serializer.save(supporter=self.request.user)
-        
+    
+    # def post(self, request):
+    #     serializer = PledgeSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(
+    #             serializer.data,
+    #             status=status.HTTP_201_CREATED
+    #         )
+    #     return Response(
+    #         serializer.errors,
+    #         status=status.HTTP_400_BAD_REQUEST
+    #     )
     def delete(self, request, id=None):
         pledge = self.get_object(id=id)
-        # serializer = ProjectDetailSerializer(project)
         pledge.delete()
         return Response(PledgeSerializer.data, status=status.HTTP_204_NO_CONTENT)
 
 
-class CommentList(generics.ListAPIView):
-    # permission class to the so only logged in users can create comments associated to a project
-    # filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+class CommentList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['project', 'author']
+    filterset_fields = ['project',]
 
-    def post(self, request):
-        serializer = CommentSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED
-            )
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    def perform_create(self, serializer):
+        serializer.save(commentor=self.request.user)
         
+    # def post(self, request):
+    #     serializer = CommentSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(
+    #             serializer.data,
+    #             status=status.HTTP_201_CREATED
+    #         )
+    #     return Response(
+    #         serializer.errors,
+    #         status=status.HTTP_400_BAD_REQUEST
+    #     )
     def delete(self, request, id=None):
         comment = self.get_object(id=id)
         comment.delete()
@@ -150,42 +158,63 @@ class CategoryDetail(generics.RetrieveAPIView):
         
     
 '''BELOW TO CULL AS THEY DO NOT SEEM TO SERVE A PURPOSE'''
-# class CommentDetail(generics.RetrieveAPIView):
-#     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-#     queryset = Comment.objects.all()
-#     serializer_class = CommentSerializer
+class CommentDetail(generics.RetrieveAPIView):
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
 
+    def get_object(self, pk):
+        try:
+            comment = Comment.objects.get(pk=pk)
+            self.check_object_permissions(self.request, comment)
+            return comment
+        except Comment.DoesNotExist:
+            raise Http404
 
-    # def get_object(self, pk):
-    #     try:
-    #         comment = Comment.objects.get(pk=pk)
-    #         self.check_object_permissions(self.request, comment)
-    #         return comment
-    #     except Comment.DoesNotExist:
-    #         raise Http404
+    def get(self, request, pk):
+        comment = self.get_object(pk)
+        serializer = CommentSerializer(comment)
+        return Response(serializer.data)
 
-    # def get(self, request, pk):
-    #     comment = self.get_object(pk)
-    #     serializer = CommentSerializer(comment)
-    #     return Response(serializer.data)
+    def put(self, request, pk):
+        comment = self.get_object(pk)
+        data = request.data
+        serializer = CommentSerializer(
+            instance=comment,
+            data=data,
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
 
-    # def put(self, request, pk):
-    #     comment = self.get_object(pk)
-    #     data = request.data
-    #     serializer = ProjectSerializer(
-    #         instance=comment,
-    #         data=data,
-    #         partial=True
-    #     )
-    #     if serializer.is_valid():
-    #         serializer.save()
+class PledgeDetail(generics.RetrieveAPIView):
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = Pledge.objects.all()
+    serializer_class = PledgeSerializer
 
-# class PledgeDetail(generics.RetrieveAPIView):
-#     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-#     queryset = Pledge.objects.all()
-#     serializer_class = PledgeSerializer
+    def get_object(self, pk):
+            try:
+                pledge = Pledge.objects.get(pk=pk)
+                self.check_object_permissions(self.request, pledge)
+                return pledge
+            except Pledge.DoesNotExist:
+                raise Http404
 
+    def get(self, request, pk):
+        pledge = self.get_object(pk)
+        serializer = PledgeSerializer(pledge)
+        return Response(serializer.data)
 
+    def put(self, request, pk):
+        pledge = self.get_object(pk)
+        data = request.data
+        serializer = PledgeSerializer(
+            instance=pledge,
+            data=data,
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
     
 ####################################################################################
 # PAGEINATOR TO BE IMPLEMENTED

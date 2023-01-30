@@ -4,7 +4,8 @@ from . import views
 
 urlpatterns = [
     path('', views.CustomUserList.as_view(),name='customuser-list'),
-    path('<int:pk>/', views.CustomUserDetail.as_view(), name='customuser-detail'),
+    #url / user / user id number
+    path('<int:pk>/', views.CustomUserDetail.as_view(), name='customuser-detail-update'),
     # path("get-details", views.CustomUserDetailAPI.as_view()),
     # path('register', views.CustomUserRegisterAPIView.as_view(),
     #      name='customuser-register')

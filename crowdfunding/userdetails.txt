@@ -1,7 +1,7 @@
 		"username": "samsam1",
 		"email": "samsam1@samsam1.com",
-		"password": "samsam123",
-		"password2": "samsam123",
+		"password": "samsam1234",
+		"password2": "samsam1234",
 		"first_name": "Sam", 
 		"last_name": "Sam"
 
@@ -28,4 +28,21 @@
 		"first_name": "Ben", 
 		"last_name": "Brown"
 	
+    
+		"username": "testuser",
+		"email": "testuser@testuser.com",
+		"password": "testuser1",
+		"password2": "testuser1",
+		"first_name": "Test", 
+		"last_name": "User"
+	
+{
+		"username": "candycane",
+		"email": "candycane@candycane.com",
+		"password": "candycane123",
+		"password2": "candycane123",
+		"first_name": "Cancy", 
+		"last_name": "Cain"
+	
+}
 
