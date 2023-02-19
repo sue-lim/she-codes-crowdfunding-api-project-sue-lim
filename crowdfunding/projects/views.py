@@ -37,7 +37,7 @@ class ProjectList(generics.ListCreateAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     filter_backends = [DjangoFilterBackend]
-    # filterset_fields = ['supporter', 'project', 'anonymous']
+    filterset_fields = ['title', 'owner', 'date_created']
 
     def perform_create(self, serializer):
         serializer.save(supporter=self.request.user)

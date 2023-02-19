@@ -21,7 +21,7 @@ class Project(models.Model):
         related_name='owner_projects'
     )
     liked_by = models.ManyToManyField(
-        User,
+        User, blank=True, null=True,
         related_name='liked_projects'
     )
     # @property & annotations
