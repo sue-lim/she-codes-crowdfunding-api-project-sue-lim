@@ -15,7 +15,8 @@ from rest_framework.settings import api_settings
 
 # class ProjectList(APIView):
 #     # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-#     permission_classes = [permissions.IsAuthenticated]
+#     # permission_classes = [permissions.IsAuthenticated]
+
 #     def post(self, request):
 #         serializer = ProjectSerializer(data=request.data)
 #         if serializer.is_valid():
@@ -28,54 +29,23 @@ from rest_framework.settings import api_settings
 #             serializer.errors,
 #             status=status.HTTP_400_BAD_REQUEST
 #         )
+'''PROJECT LIST VIEW FOR PROJECTS & IF LOGGED IN YOU CAN ADD / DELETE PROJECTS'''
 
-# class ProjectDetail(APIView):
-#     # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-#     permission_classes = [permissions.IsAuthenticated]
-    
-#     def get_object(self, pk):
-#         try:
-#             project = Project.objects.get(pk=pk)
-#             self.check_object_permissions(self.request, project)
-#             return project
-#         except Project.DoesNotExist:
-#             raise Http404
 
-#     def get(self, request, pk):
-#         project = self.get_object(pk)
-#         serializer = ProjectDetailSerializer(project)
-#         return Response(serializer.data)
-
-#     def put(self, request, pk):
-#         project = self.get_object(pk)
-#         data = request.data
-#         serializer = ProjectDetailSerializer(instance=project,data=data, partial=True)
-#         if serializer.is_valid():
-#             serializer.save()
-        
-#     def delete(self, request, id=None):
-#         project = self.get_object(id=id)
-#         serializer = ProjectDetailSerializer(project)
-#         project.delete()
-#         return Response(ProjectDetailSerializer.data, status=status.HTTP_204_NO_CONTENT)
-    
-    
-
-'''PROJECT LIST VIEW FOR PROJECTS & IF LOGGED IN YOU CAN DELETE PROJECTS'''
 class ProjectList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    # filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend]
     # filterset_fields = ['supporter', 'project', 'anonymous']
-        
+
     def perform_create(self, serializer):
         serializer.save(supporter=self.request.user)
-        
-    # def get(self, request):
-    #     projects = Project.objects.all()
-    #     serializer = ProjectSerializer(projects, many=True)
-    #     return Response(serializer.data)
+
+    def get(self, request):
+        projects = Project.objects.all()
+        serializer = ProjectSerializer(projects, many=True)
+        return Response(serializer.data)
 
     def post(self, request):
         serializer = ProjectSerializer(data=request.data)
@@ -89,25 +59,63 @@ class ProjectList(generics.ListCreateAPIView):
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+
     def delete(self, request, id=None):
         project = self.get_object(id=id)
         serializer = ProjectDetailSerializer(project)
         project.delete()
         return Response(ProjectDetailSerializer.data, status=status.HTTP_204_NO_CONTENT)
-    
+
+
+class ProjectDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+
+    # permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self, pk):
+        try:
+            project = Project.objects.get(pk=pk)
+            self.check_object_permissions(self.request, project)
+            return project
+        except Project.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk):
+        project = self.get_object(pk)
+        serializer = ProjectDetailSerializer(project)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        project = self.get_object(pk)
+        data = request.data
+        serializer = ProjectDetailSerializer(
+            instance=project, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+
+    def delete(self, request, id=None):
+        project = self.get_object(id=id)
+        serializer = ProjectDetailSerializer(project)
+        project.delete()
+        return Response(ProjectDetailSerializer.data, status=status.HTTP_204_NO_CONTENT)
+
 
 '''Pledge Create Only - NO EDITS / COMMENTS CAN NOT BE DELETED UNLESS USER IS DELETED'''
 '''Logged in users are able to view & add pledges. Not logged in, view only'''
+
+
 class PledgeList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Pledge.objects.all()
     serializer_class = PledgeSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['supporter', 'project', 'anonymous']
-        
+
     def perform_create(self, serializer):
         serializer.save(supporter=self.request.user)
-    
+
     # def post(self, request):
     #     serializer = PledgeSerializer(data=request.data)
     #     if serializer.is_valid():
@@ -125,8 +133,41 @@ class PledgeList(generics.ListCreateAPIView):
     #     pledge.delete()
     #     return Response(PledgeSerializer.data, status=status.HTTP_204_NO_CONTENT)
 
+
+class PledgeDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = Pledge.objects.all()
+    serializer_class = PledgeSerializer
+
+    def get_object(self, pk):
+        try:
+            pledge = Pledge.objects.get(pk=pk)
+            self.check_object_permissions(self.request, pledge)
+            return pledge
+        except Pledge.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk):
+        pledge = self.get_object(pk)
+        serializer = PledgeSerializer(pledge)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        pledge = self.get_object(pk)
+        data = request.data
+        serializer = PledgeSerializer(
+            instance=pledge,
+            data=data,
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+
+
 '''Comment Create Only - NO EDITS / COMMENTS CAN NOT BE DELETED UNLESS USER IS DELETED'''
 '''Logged in users are able to view & add comments. Not logged in, view only'''
+
+
 class CommentList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Comment.objects.all()
@@ -135,8 +176,8 @@ class CommentList(generics.ListCreateAPIView):
     filterset_fields = ['project',]
 
     def perform_create(self, serializer):
-        serializer.save(commentor=self.request.user)
-        
+        serializer.save(commentator=self.request.user)
+
     # def post(self, request):
     #     serializer = CommentSerializer(data=request.data)
     #     if serializer.is_valid():
@@ -153,23 +194,9 @@ class CommentList(generics.ListCreateAPIView):
     #     comment = self.get_object(id=id)
     #     comment.delete()
     #     return Response(CommentSerializer.data, status=status.HTTP_204_NO_CONTENT)
-    
-
-class CategoryList(generics.ListAPIView):
-    """ url: categories/ """
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
 
 
-class CategoryDetail(generics.RetrieveAPIView):
-    """ url: categories/<str:name>/"""
-    queryset = Category.objects.all()
-    serializer_class = CategoryDetailSerializer
-    lookup_field = 'name'
-        
-    
-'''BELOW TO CULL AS THEY DO NOT SEEM TO SERVE A PURPOSE'''
-class CommentDetail(generics.RetrieveAPIView):
+class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
@@ -198,35 +225,23 @@ class CommentDetail(generics.RetrieveAPIView):
         if serializer.is_valid():
             serializer.save()
 
-class PledgeDetail(generics.RetrieveAPIView):
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    queryset = Pledge.objects.all()
-    serializer_class = PledgeSerializer
 
-    def get_object(self, pk):
-            try:
-                pledge = Pledge.objects.get(pk=pk)
-                self.check_object_permissions(self.request, pledge)
-                return pledge
-            except Pledge.DoesNotExist:
-                raise Http404
+class CategoryList(generics.ListAPIView):
+    """ url: categories/ """
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
-    def get(self, request, pk):
-        pledge = self.get_object(pk)
-        serializer = PledgeSerializer(pledge)
-        return Response(serializer.data)
 
-    def put(self, request, pk):
-        pledge = self.get_object(pk)
-        data = request.data
-        serializer = PledgeSerializer(
-            instance=pledge,
-            data=data,
-            partial=True
-        )
-        if serializer.is_valid():
-            serializer.save()
-    
+class CategoryDetail(generics.RetrieveAPIView):
+    """ url: categories/<str:name>/"""
+    queryset = Category.objects.all()
+    serializer_class = CategoryDetailSerializer
+    lookup_field = 'name'
+
+
+'''BELOW TO CULL AS THEY DO NOT SEEM TO SERVE A PURPOSE'''
+
+
 ####################################################################################
 # PAGEINATOR TO BE IMPLEMENTED
 # class ProjectList(APIView):
@@ -266,4 +281,3 @@ class PledgeDetail(generics.RetrieveAPIView):
 
 #         serializer = ProjectSerializer(result_page, many=True)
 #         return Response(serializer.data)
-
