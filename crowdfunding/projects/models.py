@@ -14,7 +14,7 @@ class Project(models.Model):
     goal = models.IntegerField()
     image = models.URLField()
     is_open = models.BooleanField()
-    date_created = models.DateTimeField()
+    date_created = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -28,14 +28,23 @@ class Project(models.Model):
     # insert this to count the sum the amount of pledges to calculate
 
     @property
-    def total(self):
-        return self.pledges.aggregate(sum=models.Sum('amount'))['sum']
+    def sum_pledges(self):
+        pledge_sum = self.pledges.aggregate(sum=models.Sum("amount"))["sum"]
+        if pledge_sum == None:
+            return 0
+        else:
+            return pledge_sum
+
+    # @property
+    # def goal_balance(self):
+    #     return self.goal - self.sum_pledges
 
 
 '''Comments Model'''
 
 
 class Comment(models.Model):
+
     title = models.CharField(max_length=100, null=True, blank=True)
     content = models.TextField(blank=True, null=True)
     project = models.ForeignKey(
@@ -48,6 +57,7 @@ class Comment(models.Model):
 
 
 class Pledge(models.Model):
+    date_pledged = models.DateTimeField(auto_now_add=True)
     amount = models.IntegerField()
     comment = models.TextField()
     anonymous = models.BooleanField()

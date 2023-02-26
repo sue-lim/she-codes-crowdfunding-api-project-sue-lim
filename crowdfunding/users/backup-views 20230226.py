@@ -20,7 +20,7 @@ class CustomUserList(generics.ListCreateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['username', 'first_name', 'last_name', 'email']
+    filterset_fields = ['username', 'first_name', 'last_name']
 
     def get(self, request):
         users = CustomUser.objects.all()
@@ -52,6 +52,30 @@ class CustomUserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserDetailSerializer
 
+    # def get_object(self, pk):
+    #     try:
+    #         return CustomUser.objects.get(pk=pk)
+    #     except CustomUser.DoesNotExist:
+    #         raise Http404
+
+    # def get(self, request, pk):
+    #     user = self.get_object(pk)
+    #     serializer = CustomUserSerializer(user)
+    #     return Response(serializer.data)
+
+    # def put(self, request, pk):
+    #     user = self.get_object(pk)
+    #     data = request.data
+    #     serializer = CustomUserSerializer(
+    #         instance=user,
+    #         data=data,
+    #         partial=True
+    #     )
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_200_OK)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def handle_exception(self, exc):
         if isinstance(exc, Http404):
             return Response(
@@ -62,7 +86,7 @@ class CustomUserDetail(generics.RetrieveUpdateDestroyAPIView):
 
 '''ADD DEF DELETE FUNCTION'''
 
-''' CLASS FOR SESSION VIEW IN REACT'''
+''' CLASS FOR SESSION VIEW '''
 
 
 class CustomUserSessionView(generics.RetrieveUpdateAPIView):

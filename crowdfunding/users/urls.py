@@ -1,5 +1,7 @@
 from django.urls import path
+
 from . import views
+
 # from this directory import ALL Views and not one by one
 
 urlpatterns = [
@@ -7,8 +9,8 @@ urlpatterns = [
     # url / user / user id number
     path('<int:pk>/', views.CustomUserDetail.as_view(),
          name='customuser-detail-update'),
-    path('session/<int:pk>/', views.CustomUserDetail.as_view(),
-         name='customuser-profile'),
+    path('session/', views.CustomUserSessionView.as_view(),
+         name='customuser-session-view'),
     # path('register', views.CustomUserRegisterAPIView.as_view(),
     #      name='customuser-register')
 

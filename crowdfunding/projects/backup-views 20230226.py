@@ -12,6 +12,23 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from .serializers import ProjectSerializer, ProjectDetailSerializer, PledgeSerializer, PledgeDetailSerializer,  CommentSerializer, CategorySerializer, CategoryDetailSerializer
 from rest_framework.settings import api_settings
 
+
+# class ProjectList(APIView):
+#     # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+#     # permission_classes = [permissions.IsAuthenticated]
+
+#     def post(self, request):
+#         serializer = ProjectSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(
+#                 serializer.data,
+#                 status=status.HTTP_201_CREATED
+#             )
+#         return Response(
+#             serializer.errors,
+#             status=status.HTTP_400_BAD_REQUEST
+#         )
 '''PROJECT LIST VIEW FOR PROJECTS & IF LOGGED IN YOU CAN ADD / DELETE PROJECTS'''
 
 
@@ -99,6 +116,23 @@ class PledgeList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(supporter=self.request.user)
 
+    # def post(self, request):
+    #     serializer = PledgeSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(
+    #             serializer.data,
+    #             status=status.HTTP_201_CREATED
+    #         )
+    #     return Response(
+    #         serializer.errors,
+    #         status=status.HTTP_400_BAD_REQUEST
+    #     )
+    # def delete(self, request, id=None):
+    #     pledge = self.get_object(id=id)
+    #     pledge.delete()
+    #     return Response(PledgeSerializer.data, status=status.HTTP_204_NO_CONTENT)
+
 
 class PledgeDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -143,6 +177,23 @@ class CommentList(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(commentator=self.request.user)
+
+    # def post(self, request):
+    #     serializer = CommentSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(
+    #             serializer.data,
+    #             status=status.HTTP_201_CREATED
+    #         )
+    #     return Response(
+    #         serializer.errors,
+    #         status=status.HTTP_400_BAD_REQUEST
+    #     )
+    # def delete(self, request, id=None):
+    #     comment = self.get_object(id=id)
+    #     comment.delete()
+    #     return Response(CommentSerializer.data, status=status.HTTP_204_NO_CONTENT)
 
 
 class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
