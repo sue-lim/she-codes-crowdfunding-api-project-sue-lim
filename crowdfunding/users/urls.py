@@ -7,7 +7,8 @@ urlpatterns = [
     # url / user / user id number
     path('<int:pk>/', views.CustomUserDetail.as_view(),
          name='customuser-detail-update'),
-    # path("get-details", views.CustomUserDetailAPI.as_view()),
+    path('session/<int:pk>/', views.CustomUserDetail.as_view(),
+         name='customuser-profile'),
     # path('register', views.CustomUserRegisterAPIView.as_view(),
     #      name='customuser-register')
 
