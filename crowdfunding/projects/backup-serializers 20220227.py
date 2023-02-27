@@ -3,7 +3,8 @@ from .models import Project, Pledge, Comment, Category, Favourite
 from rest_framework import serializers
 from users.serializers import CustomUserSerializer
 
-'''Serializer / Forms'''
+
+'''Comments Serializer / Form'''
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -17,23 +18,42 @@ class CommentSerializer(serializers.ModelSerializer):
         # fields = ['id', 'project', 'title', 'content', 'author']
         # read_only_fields = ['id']
 
+    def create(self, validated_data):
+        return Comment.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.save()
+        return instance
+
+
+'''Pledge Serializer / Form'''
+
 
 class PledgeSerializer(serializers.ModelSerializer):
     supporter = serializers.ReadOnlyField(source='supporter.username')
+    project = serializers.SlugRelatedField(
+        queryset=Project.objects.all(), slug_field="title")
 
     class Meta:
         model = Pledge
         fields = '__all__'
-
         '''THIS LINE __all__ replaces the needs in the model.serializer to dd the fields seperately'''
 
+    def create(self, validated_data):
+        return Pledge.objects.create(**validated_data)
 
-class PledgeDetailSerializer(PledgeSerializer):
-    project = serializers.CharField(source='project.title')
+    def update(self, instance, validated_data):
+        instance.save()
+        return instance
 
+
+class PledgeDetailSerializer(serializers.ModelSerializer):
+    # project = serializers.SlugRelatedField(
+    #     queryset=Project.objects.all(), slug_field="title")
     class Meta:
         model = Pledge
         fields = '__all__'
+        read_only_fields = ["id", "supporter", "amount", "project"]
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -51,6 +71,29 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = '__all__'
 
+    # def create(self, validated_data):
+    #     return Project.objects.create(**validated_data)
+
+    # def update(self, instance, validated_data):
+    #     instance.save()
+    #     return instance
+
+    # def create(self, validated_data):
+    #     return Project.objects.create(**validated_data)
+
+    # def update(self, instance, validated_data):
+    #     instance.title = validated_data.get('title', instance.title)
+    #     instance.description = validated_data.get(
+    #         'description', instance.description)
+    #     instance.goal = validated_data.get('goal', instance.goal)
+    #     instance.image = validated_data.get('image', instance.image)
+    #     instance.is_open = validated_data.get('is_open', instance.is_open)
+    #     instance.date_created = validated_data.get(
+    #         'date_created', instance.date_created)
+    #     instance.owner = validated_data.get('owner', instance.owner)
+    #     instance.save()
+    #     return instance
+
 
 class ProjectDetailSerializer(ProjectSerializer):
     pledges = PledgeSerializer(many=True, read_only=True)
@@ -60,6 +103,9 @@ class ProjectDetailSerializer(ProjectSerializer):
     class Meta:
         model = Project
         fields = '__all__'
+
+
+'''Category Serializer'''
 
 
 class CategorySerializer(serializers.ModelSerializer):

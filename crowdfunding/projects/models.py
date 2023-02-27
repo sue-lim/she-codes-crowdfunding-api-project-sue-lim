@@ -20,10 +20,10 @@ class Project(models.Model):
         on_delete=models.CASCADE,
         related_name='owner_projects'
     )
-    liked_by = models.ManyToManyField(
-        User, blank=True, null=True,
-        related_name='liked_projects'
-    )
+    # # liked_by = models.ManyToManyField(
+    # #     User, blank=True, null=True,
+    # #     related_name='liked_projects'
+    # )
     # @property & annotations
     # insert this to count the sum the amount of pledges to calculate
 
@@ -35,9 +35,13 @@ class Project(models.Model):
         else:
             return pledge_sum
 
-    # @property
-    # def goal_balance(self):
-    #     return self.goal - self.sum_pledges
+    @property
+    def goal_balance(self):
+        return self.goal - self.sum_pledges
+
+    # code to return title name in the drop down
+    def __str__(self):
+        return self.title
 
 
 '''Comments Model'''
