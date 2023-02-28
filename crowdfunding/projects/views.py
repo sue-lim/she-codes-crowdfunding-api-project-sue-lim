@@ -4,7 +4,7 @@ from django.http import Http404
 from django.contrib.auth.decorators import login_required
 from .filters import DynamicSearchFilter
 from .models import Project, Pledge, Comment, Category
-from .permissions import IsOwnerOrReadOnly, IsSupporterOrReadOnly, IsCommenterOrReadOnly
+from .permissions import IsOwnerOrReadOnly
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions, generics
@@ -51,13 +51,38 @@ class ProjectList(generics.ListCreateAPIView):
 
 
 class ProjectDetail(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(Project=self.request.user)
+    # permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self, pk):
+        try:
+            project = Project.objects.get(pk=pk)
+            self.check_object_permissions(self.request, project)
+            return project
+        except Project.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk):
+        project = self.get_object(pk)
+        serializer = ProjectDetailSerializer(project)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        project = self.get_object(pk)
+        data = request.data
+        serializer = ProjectDetailSerializer(
+            instance=project, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+
+    def delete(self, request, id=None):
+        project = self.get_object(id=id)
+        serializer = ProjectDetailSerializer(project)
+        project.delete()
+        return Response(ProjectDetailSerializer.data, status=status.HTTP_204_NO_CONTENT)
 
 
 '''Pledge Create Only - NO EDITS / COMMENTS CAN NOT BE DELETED UNLESS USER IS DELETED'''
@@ -76,9 +101,7 @@ class PledgeList(generics.ListCreateAPIView):
 
 
 class PledgeDetail(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly, IsSupporterOrReadOnly]
-    permission_classes = []
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Pledge.objects.all()
     serializer_class = PledgeDetailSerializer
 
@@ -123,7 +146,7 @@ class CommentList(generics.ListCreateAPIView):
 
 
 class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 

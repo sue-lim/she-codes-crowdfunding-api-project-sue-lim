@@ -1,3 +1,4 @@
+
 from django.contrib import admin
 
 
@@ -6,15 +7,20 @@ from .import models
 
 
 class Projects(admin.ModelAdmin):
-    list_display = ('id', 'title', 'owner', 'goal', 'is_open', 'date_created')
+    list_display = ('author', 'title', 'date_created', 'owner', 'liked_by')
+    ordering = ['author', 'title', 'date_created', 'owner', 'liked_by']
+    # search = ['title', 'content']
+    # actions = ['edit']
 
 
 class Pledges(admin.ModelAdmin):
-    list_display = ('supporter', 'comment', 'project', 'amount')
+    list_display = ('supporter', 'comment', 'project')
+    ordering = ['supporter', 'comment', 'project']
 
 
 class Comments(admin.ModelAdmin):
     list_display = ('comment', 'comment_author_projects')
+    ordering = ('comment', 'comment_author_projects')
 
 
 admin.site.register(models.Project)

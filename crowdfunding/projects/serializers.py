@@ -17,35 +17,67 @@ class CommentSerializer(serializers.ModelSerializer):
         # fields = ['id', 'project', 'title', 'content', 'author']
         # read_only_fields = ['id']
 
+    def create(self, validated_data):
+        return Comment.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.save()
+        return instance
+
 
 class PledgeSerializer(serializers.ModelSerializer):
     supporter = serializers.ReadOnlyField(source='supporter.username')
+    project = serializers.SlugRelatedField(
+        queryset=Project.objects.all(), slug_field="title")
 
     class Meta:
         model = Pledge
+        # fields = ['id', 'amount', 'comment','anonymous', 'project', 'supporter']
+        # read_only_fields = ['id', 'supporter']
         fields = '__all__'
-
         '''THIS LINE __all__ replaces the needs in the model.serializer to dd the fields seperately'''
 
+    def create(self, validated_data):
+        return Pledge.objects.create(**validated_data)
 
-class PledgeDetailSerializer(PledgeSerializer):
-    project = serializers.CharField(source='project.title')
+    def update(self, instance, validated_data):
+        instance.save()
+        return instance
+
+
+class PledgeDetailSerializer(serializers.ModelSerializer):
+    project = serializers.SlugRelatedField(
+        queryset=Project.objects.all(), slug_field="title")
 
     class Meta:
         model = Pledge
         fields = '__all__'
+        # fields = ["id", "amount", "comment", "anonymous",
+        #           "project", "supporter", "date_pledged"]
+        read_only_fields = ["id", "supporter", "amount", "project"]
 
 
 class ProjectSerializer(serializers.ModelSerializer):
-    title = serializers.CharField(max_length=200)
-    description = serializers.CharField(max_length=None)
-    image = serializers.URLField()
-    # is_open = serializers.BooleanField()
-    date_created = serializers.DateTimeField()
-    owner = serializers.ReadOnlyField(source='owner.username')
+    # title = serializers.CharField(max_length=200)
+    # description = serializers.CharField(max_length=None)
+    # image = serializers.URLField()
+    # # is_open = serializers.BooleanField()
+    # date_created = serializers.DateTimeField()
+    # owner = serializers.ReadOnlyField(source='owner.username')
     goal = serializers.IntegerField()
     sum_pledges = serializers.ReadOnlyField()
     goal_balance = serializers.ReadOnlyField()
+    id = serializers.ReadOnlyField()
+    title = serializers.CharField(max_length=200)
+    description = serializers.CharField(max_length=None)
+    goal = serializers.IntegerField()
+    image = serializers.URLField()
+    is_open = serializers.BooleanField()
+    date_created = serializers.DateTimeField()
+    # comments = CommentSerializer(many=True)
+    # owner_id = serializers.ReadOnlyField(source='owner.id')
+    owner_username = serializers.ReadOnlyField(source='owner.username')
+    total = serializers.ReadOnlyField()
 
     class Meta:
         model = Project
