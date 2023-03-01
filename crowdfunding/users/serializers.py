@@ -7,9 +7,9 @@ from django.contrib.auth.password_validation import validate_password
 
 # Serializer to Get User Details using Django Token Authentication
 class CustomUserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(write_only=True, required=True)
-    first_name = serializers.CharField(write_only=True, required=True)
-    last_name = serializers.CharField(write_only=True, required=True)
+    username = serializers.CharField(max_length=200)
+    first_name = serializers.CharField(max_length=200)
+    last_name = serializers.CharField(max_length=200)
     email = serializers.EmailField(required=True,
                                    validators=[UniqueValidator(queryset=CustomUser.objects.all())])
     password = serializers.CharField(
