@@ -37,6 +37,12 @@ class PledgeSerializer(serializers.ModelSerializer):
         fields = '__all__'
         '''THIS LINE __all__ replaces the needs in the model.serializer to dd the fields seperately'''
 
+    def get_supporter(self, obj):
+        if obj.anonymous:
+            return None
+        else:
+            return obj.supporter.username
+
     def create(self, validated_data):
         return Pledge.objects.create(**validated_data)
 
@@ -58,12 +64,6 @@ class PledgeDetailSerializer(serializers.ModelSerializer):
 
 
 class ProjectSerializer(serializers.ModelSerializer):
-    # title = serializers.CharField(max_length=200)
-    # description = serializers.CharField(max_length=None)
-    # image = serializers.URLField()
-    # # is_open = serializers.BooleanField()
-    # date_created = serializers.DateTimeField()
-    # owner = serializers.ReadOnlyField(source='owner.username')
     goal = serializers.IntegerField()
     sum_pledges = serializers.ReadOnlyField()
     goal_balance = serializers.ReadOnlyField()

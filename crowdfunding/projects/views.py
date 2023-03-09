@@ -4,7 +4,7 @@ from django.http import Http404
 from django.contrib.auth.decorators import login_required
 from .filters import DynamicSearchFilter
 from .models import Project, Pledge, Comment, Category
-from .permissions import IsOwnerOrReadOnly
+from .permissions import IsOwnerOrReadOnly, IsSupporterOrReadOnly
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions, generics
@@ -22,26 +22,33 @@ class ProjectList(generics.ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['title', 'owner', 'date_created']
 
-    def perform_create(self, serializer):
-        serializer.save(supporter=self.request.user)
+    # def perform_create(self, serializer):
+    #     serializer.save(supporter=self.request.user)
 
-    def get(self, request):
-        projects = Project.objects.all()
-        serializer = ProjectSerializer(projects, many=True)
-        return Response(serializer.data)
+    # def get(self, request):
+    #     projects = Project.objects.all()
+    #     serializer = ProjectSerializer(projects, many=True)
+    #     return Response(serializer.data)
 
     def post(self, request):
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(owner=request.user)
-            return Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED
-            )
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # def post(self, request):
+    #     serializer = ProjectSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save(owner=request.user)
+    #         return Response(
+    #             serializer.data,
+    #             status=status.HTTP_201_CREATED
+    #         )
+    #     return Response(
+    #         serializer.errors,
+    #         status=status.HTTP_400_BAD_REQUEST
+    #     )
 
     def delete(self, request, id=None):
         project = self.get_object(id=id)
@@ -90,7 +97,7 @@ class ProjectDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class PledgeList(generics.ListCreateAPIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Pledge.objects.all()
     serializer_class = PledgeSerializer
     filter_backends = [DjangoFilterBackend]
@@ -101,33 +108,34 @@ class PledgeList(generics.ListCreateAPIView):
 
 
 class PledgeDetail(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly, IsSupporterOrReadOnly]
     queryset = Pledge.objects.all()
     serializer_class = PledgeDetailSerializer
 
-    def get_object(self, pk):
-        try:
-            pledge = Pledge.objects.get(pk=pk)
-            self.check_object_permissions(self.request, pledge)
-            return pledge
-        except Pledge.DoesNotExist:
-            raise Http404
+    # def get_object(self, pk):
+    #     try:
+    #         pledge = Pledge.objects.get(pk=pk)
+    #         self.check_object_permissions(self.request, pledge)
+    #         return pledge
+    #     except Pledge.DoesNotExist:
+    #         raise Http404
 
-    def get(self, request, pk):
-        pledge = self.get_object(pk)
-        serializer = PledgeSerializer(pledge)
-        return Response(serializer.data)
+    # def get(self, request, pk):
+    #     pledge = self.get_object(pk)
+    #     serializer = PledgeSerializer(pledge)
+    #     return Response(serializer.data)
 
-    def put(self, request, pk):
-        pledge = self.get_object(pk)
-        data = request.data
-        serializer = PledgeSerializer(
-            instance=pledge,
-            data=data,
-            partial=True
-        )
-        if serializer.is_valid():
-            serializer.save()
+    # def put(self, request, pk):
+    #     pledge = self.get_object(pk)
+    #     data = request.data
+    #     serializer = PledgeSerializer(
+    #         instance=pledge,
+    #         data=data,
+    #         partial=True
+    #     )
+    #     if serializer.is_valid():
+    #         serializer.save()
 
 
 '''Comment Create Only - NO EDITS / COMMENTS CAN NOT BE DELETED UNLESS USER IS DELETED'''
