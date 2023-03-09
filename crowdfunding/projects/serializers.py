@@ -8,8 +8,8 @@ from users.serializers import CustomUserSerializer
 
 class CommentSerializer(serializers.ModelSerializer):
     commentator = serializers.ReadOnlyField(source='commentator.username')
-    project = serializers.SlugRelatedField(
-        queryset=Project.objects.all(), slug_field="title")
+    # project = serializers.SlugRelatedField(
+    #     queryset=Project.objects.all(), slug_field="title")
 
     class Meta:
         model = Comment
@@ -27,8 +27,8 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class PledgeSerializer(serializers.ModelSerializer):
     supporter = serializers.ReadOnlyField(source='supporter.username')
-    project = serializers.SlugRelatedField(
-        queryset=Project.objects.all(), slug_field="title")
+    # project = serializers.SlugRelatedField(
+    #     queryset=Project.objects.all(), slug_field="title")
 
     class Meta:
         model = Pledge
@@ -52,8 +52,8 @@ class PledgeSerializer(serializers.ModelSerializer):
 
 
 class PledgeDetailSerializer(serializers.ModelSerializer):
-    project = serializers.SlugRelatedField(
-        queryset=Project.objects.all(), slug_field="title")
+    # project = serializers.SlugRelatedField(
+    #     queryset=Project.objects.all(), slug_field="title")
 
     class Meta:
         model = Pledge
