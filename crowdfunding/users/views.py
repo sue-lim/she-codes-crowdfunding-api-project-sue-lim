@@ -16,7 +16,7 @@ from projects.permissions import IsOwnProfile
 
 
 class CustomUserList(generics.ListCreateAPIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
     filter_backends = [DjangoFilterBackend]
@@ -52,12 +52,12 @@ class CustomUserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserDetailSerializer
 
-    def handle_exception(self, exc):
-        if isinstance(exc, Http404):
-            return Response(
-                {"data": "Sorry, user here!"}, status=status.HTTP_404_NOT_FOUND
-            )
-        return super(CustomUserDetail, self).handle_exception(exc)
+    # def handle_exception(self, exc):
+    #     if isinstance(exc, Http404):
+    #         return Response(
+    #             {"data": "Sorry, user here!"}, status=status.HTTP_404_NOT_FOUND
+    #         )
+    #     return super(CustomUserDetail, self).handle_exception(exc)
 
 
 '''ADD DEF DELETE FUNCTION'''

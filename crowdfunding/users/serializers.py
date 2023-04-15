@@ -44,8 +44,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
 class CustomUserDetailSerializer(CustomUserSerializer):
     class Meta:
         model = CustomUser
-        fields = ['username', 'first_name', 'last_name',
-                  'email', 'password', 'password2']
+        fields = ['id','username', 'first_name', 'last_name', 'email', 'last_login', 'date_joined','password', 'password2']
+        read_only_fields =['id','last_login', 'date_joined']
         extra_kwargs = {'first_name': {'required': True},
                         'last_name': {'required': True}}
 
