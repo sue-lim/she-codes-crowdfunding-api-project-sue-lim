@@ -10,6 +10,9 @@ Once these are up & going and also if this proves it self to be successful, furt
 # Tech Utilized 
 Back End Project utlising #DRF & deployed via FlyIO - https://fly.io/ || Back end URL - https://spring-glade-2620.fly.dev/projects/
 
+![image](https://user-images.githubusercontent.com/113986306/232380163-b27008a8-5b7e-472d-becd-84c837167996.png)
+
+
 # TARGET AUDIENCE - ALL / CHARITY ORGANISATIONS / VOLUNTEERS 
 ***Purpose***
 To provide a Mobile Shower Service for the homeless people in Perth. 
