@@ -17,12 +17,28 @@ class CommentSerializer(serializers.ModelSerializer):
         # fields = ['id', 'project', 'title', 'content', 'author']
         # read_only_fields = ['id']
 
+    def get_commentator(self, obj):
+        if obj.anonymous:
+            return None
+        else:
+            return obj.commentator.username
+        
     def create(self, validated_data):
         return Comment.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         instance.save()
         return instance
+    
+class CommentDetailSerializer(serializers.ModelSerializer):
+        # project = serializers.SlugRelatedField(
+    #     queryset=Project.objects.all(), slug_field="title")
+
+    class Meta:
+        model = Comment
+        fields = '__all__'
+        # fields = ['id', 'project', 'title', 'content', 'commentator']
+        read_only_fields = ['id','commentator']
 
 
 class PledgeSerializer(serializers.ModelSerializer):
@@ -91,7 +107,8 @@ class ProjectDetailSerializer(ProjectSerializer):
 
     class Meta:
         model = Project
-        fields = '__all__'
+        fields = ['title', 'description','goal','image','is_open','liked_by']
+        read_only_fields = ['id', 'owner']
 
 
 class CategorySerializer(serializers.ModelSerializer):
