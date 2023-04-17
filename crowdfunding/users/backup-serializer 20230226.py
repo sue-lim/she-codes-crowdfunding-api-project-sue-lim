@@ -7,11 +7,8 @@ from django.contrib.auth.password_validation import validate_password
 
 # Serializer to Get User Details using Django Token Authentication
 class CustomUserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(max_length=200)
-    first_name = serializers.CharField(max_length=200)
-    last_name = serializers.CharField(max_length=200)
-    email = serializers.EmailField(required=True,
-                                   validators=[UniqueValidator(queryset=CustomUser.objects.all())])
+    email = serializers.EmailField(required=True, validators=[
+                                   UniqueValidator(queryset=CustomUser.objects.all())])
     password = serializers.CharField(
         write_only=True, required=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, required=True)
@@ -44,8 +41,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
 class CustomUserDetailSerializer(CustomUserSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id','username', 'first_name', 'last_name', 'email', 'last_login', 'date_joined','password', 'password2']
-        read_only_fields =['id','last_login', 'date_joined']
+        fields = ['username', 'first_name', 'last_name',
+                  'email', 'password', 'password2']
         extra_kwargs = {'first_name': {'required': True},
                         'last_name': {'required': True}}
 

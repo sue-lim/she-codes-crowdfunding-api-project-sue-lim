@@ -20,10 +20,10 @@ class Project(models.Model):
         on_delete=models.CASCADE,
         related_name='owner_projects'
     )
-    liked_by = models.ManyToManyField(
-        User, blank=True, null=True,
-        related_name='liked_projects'
-    )
+    # # liked_by = models.ManyToManyField(
+    # #     User, blank=True, null=True,
+    # #     related_name='liked_projects'
+    # )
     # @property & annotations
     # insert this to count the sum the amount of pledges to calculate
 
