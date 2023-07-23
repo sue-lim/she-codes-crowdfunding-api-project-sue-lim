@@ -10,6 +10,7 @@ Once these are up & going and also if this proves it self to be successful, furt
 > Back End Project utlising:
 > * Python | #DRF & deployed via FlyIO - https://fly.io/
 > * Back end URL - https://spring-glade-2620.fly.dev/projects/
+> * Login 'admin' | Password 'admin'
 
 ![image](https://user-images.githubusercontent.com/113986306/232380163-b27008a8-5b7e-472d-becd-84c837167996.png)
 
